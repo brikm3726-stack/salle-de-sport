@@ -382,6 +382,7 @@ function brancherPaiement() {
 //  MODALE ABONNEMENT (le coach paie l'app)
 // ============================================================
 let planChoisi = "annuel";
+let methodeChoisie = "Baridi Mob";
 
 function ouvrirAbonnement() {
   $("#overlaySub").classList.remove("hidden");
@@ -399,7 +400,16 @@ function brancherAbonnement() {
     };
   });
 
-  $("#copyRip").onclick = async () => {
+  // Choix du moyen de paiement
+  $$("#overlaySub .pay-method").forEach((m) => {
+    m.onclick = () => {
+      methodeChoisie = m.dataset.method;
+      $$("#overlaySub .pay-method").forEach((x) => x.classList.toggle("on", x === m));
+    };
+  });
+
+  $("#copyRip").onclick = async (e) => {
+    e.stopPropagation(); // ne pas déclencher la sélection de la carte
     const rip = $("#rip").textContent.trim();
     try { await navigator.clipboard.writeText(rip); } catch {}
     $("#copyRip").textContent = "✅";
@@ -409,7 +419,7 @@ function brancherAbonnement() {
   $("#subConfirm").onclick = () => {
     const prix = planChoisi === "annuel" ? "19000 DA / an" : "1200 DA / mois";
     message($("#subMsg"),
-      `✅ Formule ${planChoisi} (${prix}) sélectionnée. Envoie la capture de ton paiement Baridi Mob / RedotPay / PayPal pour activer ton compte.`,
+      `✅ Formule ${planChoisi} (${prix}) — paiement par ${methodeChoisie}. Envoie la capture de ton paiement pour activer ton compte.`,
       "ok");
   };
 }

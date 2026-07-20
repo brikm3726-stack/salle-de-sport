@@ -179,28 +179,31 @@
           </button>
         </div>
 
-        <div class="pay-title">💳 Moyens de paiement</div>
+        <div class="pay-title">💳 Choisis ton moyen de paiement</div>
 
-        <div class="pay-method">
+        <button class="pay-method on" data-method="Baridi Mob">
           <div class="pay-ico" style="background:linear-gradient(135deg,#00843d,#00a651)">BM</div>
           <div class="pay-info">
             <b>Baridi Mob</b>
             <div class="pay-account">
               <code id="rip">00799999004120286181</code>
-              <button class="icon-btn" id="copyRip" title="Copier">📋</button>
+              <span class="icon-btn" id="copyRip" title="Copier">📋</span>
             </div>
           </div>
-        </div>
+          <span class="pay-check">✓</span>
+        </button>
 
-        <div class="pay-method">
+        <button class="pay-method" data-method="RedotPay">
           <div class="pay-ico" style="background:linear-gradient(135deg,#7b2ff7,#f107a3)">R</div>
           <div class="pay-info"><b>RedotPay</b><small>Paiement par carte / crypto</small></div>
-        </div>
+          <span class="pay-check">✓</span>
+        </button>
 
-        <div class="pay-method">
+        <button class="pay-method" data-method="PayPal">
           <div class="pay-ico" style="background:linear-gradient(135deg,#003087,#009cde)">P</div>
           <div class="pay-info"><b>PayPal</b><small>Paiement international</small></div>
-        </div>
+          <span class="pay-check">✓</span>
+        </button>
 
         <div id="subMsg" class="msg info" style="margin-top:16px"></div>
         <button class="btn btn-primary btn-block" id="subConfirm" style="margin-top:18px">
