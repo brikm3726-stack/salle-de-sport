@@ -53,6 +53,7 @@ img{max-width:100%}
 .brand span{color:var(--accent);font-size:12px;display:block;letter-spacing:3px;font-weight:700}
 .topbar-right{display:flex;align-items:center;gap:14px}
 .coach-chip{display:flex;align-items:center;gap:10px;font-size:14px}
+.coach-chip span{text-transform:uppercase;font-weight:700;letter-spacing:.5px}
 .coach-chip img,.coach-chip .ph{
   width:36px;height:36px;border-radius:50%;object-fit:cover;
   background:var(--card2);display:grid;place-items:center;border:2px solid var(--accent);
