@@ -24,6 +24,9 @@ function cacher(el) { el.className = "msg"; }
 async function init() {
   if (MODE_DEMO) $("#demoBar").classList.remove("hidden");
 
+  // Si Google/Supabase renvoie une erreur, elle est dans l'URL → on l'affiche
+  afficherErreurUrl();
+
   // Après un retour de connexion Google, Supabase place la session dans l'URL
   if (sb) {
     sb.auth.onAuthStateChange(() => router());
@@ -32,26 +35,44 @@ async function init() {
   brancherEvenements();
 }
 
+// Lit une éventuelle erreur OAuth dans l'URL (#error=... ou ?error=...)
+function afficherErreurUrl() {
+  const p = new URLSearchParams(
+    (location.hash || "").replace(/^#/, "") + "&" + (location.search || "").replace(/^\?/, "")
+  );
+  const err = p.get("error_description") || p.get("error");
+  if (err) {
+    afficher("auth");
+    message($("#authMsg"), "⚠️ Connexion Google : " + decodeURIComponent(err).replace(/\+/g, " "), "err");
+  }
+}
+
 // Décide quelle vue montrer selon l'état de connexion
 async function router() {
-  const user = await Auth.user();
-  ETAT.user = user;
+  try {
+    const user = await Auth.user();
+    ETAT.user = user;
 
-  if (!user) { renderTop(); afficher("auth"); return; }
+    if (!user) { renderTop(); afficher("auth"); return; }
 
-  const profil = await Profile.get(user.id);
-  ETAT.profil = profil;
+    const profil = await Profile.get(user.id);
+    ETAT.profil = profil;
 
-  if (!profil || !profil.profil_complet) {
+    if (!profil || !profil.profil_complet) {
+      renderTop();
+      prefillProfil(user, profil);
+      afficher("profil");
+      return;
+    }
+
     renderTop();
-    prefillProfil(user, profil);
-    afficher("profil");
-    return;
+    await chargerAthletes();
+    afficher("dashboard");
+  } catch (e) {
+    console.error("Erreur router:", e);
+    afficher("auth");
+    message($("#authMsg"), "⚠️ Erreur : " + (e.message || e), "err");
   }
-
-  renderTop();
-  await chargerAthletes();
-  afficher("dashboard");
 }
 
 // ---------- Barre du haut (coach connecté) ----------
