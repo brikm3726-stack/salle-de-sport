@@ -77,7 +77,9 @@ img{max-width:100%}
 
 /* ---------- Cartes / conteneurs ---------- */
 .wrap{max-width:1150px;margin:0 auto;padding:26px 18px}
-.center-screen{min-height:calc(100vh - 78px);display:grid;place-items:center;padding:24px}
+.center-screen{min-height:calc(100vh - 78px);display:grid;place-items:center;padding:24px;
+  background:linear-gradient(rgba(10,12,17,.74),rgba(10,12,17,.86)),
+    url("../fond.jpg") center/cover fixed no-repeat}
 .card{background:var(--card);border:1px solid var(--line);border-radius:20px;
   box-shadow:var(--shadow)}
 .pad{padding:28px}

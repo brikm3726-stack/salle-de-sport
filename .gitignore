@@ -1,3 +1,8 @@
 node_modules/
 .DS_Store
 Thumbs.db
+
+# Grosses images non utilisées par le site
+bl1.jpg
+rz 1.jpg
+photo fond.jpg
