@@ -148,15 +148,26 @@ input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(25
 .stat:hover.gold .n{color:#c98b00}
 
 .toolbar{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
-.search{flex:1;min-width:200px}
+.search{flex:1;min-width:200px;background:rgba(255,255,255,.05);
+  backdrop-filter:blur(6px);border-color:rgba(255,255,255,.16);transition:.18s}
+.search::placeholder{color:rgba(255,255,255,.6)}
+.search:hover,.search:focus{background:#fff;color:#1a1a1a;border-color:#fff;box-shadow:none}
+.search:hover::placeholder,.search:focus::placeholder{color:#8a94a5}
 
 /* ---------- Table des athlètes ---------- */
-.table-wrap{overflow-x:auto;border-radius:18px;border:1px solid var(--line)}
-table{width:100%;border-collapse:collapse;min-width:820px;background:var(--card)}
+.table-wrap{overflow-x:auto;border-radius:18px;border:1px solid rgba(255,255,255,.16);
+  backdrop-filter:blur(6px)}
+table{width:100%;border-collapse:collapse;min-width:820px;background:rgba(255,255,255,.04)}
 thead th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:1px;
-  color:var(--muted);padding:14px 16px;border-bottom:1px solid var(--line);background:var(--bg2)}
-tbody td{padding:13px 16px;border-bottom:1px solid var(--line);font-size:14px;vertical-align:middle}
-tbody tr:hover{background:var(--card2)}
+  color:var(--muted);padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.07)}
+tbody td{padding:13px 16px;border-bottom:1px solid rgba(255,255,255,.1);
+  font-size:14px;vertical-align:middle;transition:.15s}
+tbody tr{transition:.15s}
+tbody tr:hover{background:#fff}
+tbody tr:hover td{color:#1a1a1a}
+tbody tr:hover .ath small,tbody tr:hover .streak small{color:#5a6472}
+tbody tr:hover .ath .ph,tbody tr:hover .icon-btn{background:#eef1f5;color:#1a1a1a;border-color:#d5dae1}
 tbody tr:last-child td{border-bottom:none}
 .ath{display:flex;align-items:center;gap:12px}
 .ath img,.ath .ph{width:46px;height:46px;border-radius:12px;object-fit:cover;
