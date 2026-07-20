@@ -196,6 +196,18 @@ tbody tr:last-child td{border-bottom:none}
 .empty{text-align:center;padding:60px 20px;color:var(--muted)}
 .empty .em{font-size:48px;margin-bottom:12px}
 
+/* ---------- Formulaire athlète transparent ---------- */
+#overlay .card{background:rgba(23,28,37,.72);backdrop-filter:blur(16px);
+  border-color:rgba(255,255,255,.14)}
+#overlay .modal-head{border-bottom-color:rgba(255,255,255,.12)}
+#athleteForm input{background:rgba(255,255,255,.05);
+  border-color:rgba(255,255,255,.16);transition:.18s}
+#athleteForm input::placeholder{color:rgba(255,255,255,.55)}
+#athleteForm input:hover,#athleteForm input:focus{
+  background:#fff;color:#1a1a1a;border-color:#fff;box-shadow:none}
+#athleteForm input:hover::placeholder,#athleteForm input:focus::placeholder{color:#8a94a5}
+#athleteForm .photo-preview{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.22)}
+
 /* ---------- Modale ---------- */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(3px);
   z-index:50;display:grid;place-items:center;padding:20px}
