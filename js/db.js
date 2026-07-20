@@ -1,0 +1,263 @@
+// ============================================================
+//  MA SALLE — COUCHE DE DONNÉES
+//  Utilise Supabase si configuré, sinon un "mode démo" local
+//  (les données restent dans ce navigateur).
+// ============================================================
+
+let sb = null;
+if (SUPABASE_READY && window.supabase) {
+  sb = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+}
+const MODE_DEMO = !sb;
+
+// ------------------------------------------------------------
+//  OUTILS DATES
+// ------------------------------------------------------------
+function ajouterJours(dateStr, n) {
+  const d = new Date(dateStr);
+  d.setDate(d.getDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+function aujourdhui() {
+  return new Date().toISOString().slice(0, 10);
+}
+function joursRestants(dateFin) {
+  const diff = new Date(dateFin) - new Date(aujourdhui());
+  return Math.round(diff / 86400000);
+}
+function formatDate(dateStr) {
+  if (!dateStr) return "—";
+  return new Date(dateStr).toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
+}
+
+// ------------------------------------------------------------
+//  LOGIQUE DE L'ABONNEMENT + FIDÉLITÉ
+//  6 mois consécutifs → +15 jours offerts sur le 7e mois.
+// ------------------------------------------------------------
+function calculerRenouvellement(athlete, datePaiement) {
+  const R = REGLES;
+  let consecutif = true;
+
+  if (athlete && athlete.date_prochain_paiement) {
+    const limite = ajouterJours(athlete.date_prochain_paiement, R.graceJours);
+    consecutif = datePaiement <= limite; // renouvelé à temps ?
+  }
+
+  const mois = consecutif ? (athlete?.mois_consecutifs || 0) + 1 : 1;
+
+  // Bonus au 7e, 13e, 19e... mois (après chaque cycle de 6 mois)
+  const bonus = mois > R.cycleBonus && (mois - 1) % R.cycleBonus === 0;
+  const jours = R.dureeJours + (bonus ? R.bonusJours : 0);
+
+  return {
+    date_paiement: datePaiement,
+    date_prochain_paiement: ajouterJours(datePaiement, jours),
+    mois_consecutifs: mois,
+    bonus_actif: bonus,
+    jours_ajoutes: jours,
+  };
+}
+
+// Combien de mois avant le prochain bonus
+function moisAvantBonus(mois) {
+  const reste = REGLES.cycleBonus - (mois % REGLES.cycleBonus);
+  return reste === 0 ? REGLES.cycleBonus : reste;
+}
+
+// ------------------------------------------------------------
+//  STOCKAGE LOCAL (mode démo)
+// ------------------------------------------------------------
+const LS = {
+  get(k, def) { try { return JSON.parse(localStorage.getItem(k)) ?? def; } catch { return def; } },
+  set(k, v) { localStorage.setItem(k, JSON.stringify(v)); },
+};
+const KEY_SESSION = "masalle_session";
+const KEY_COACHES = "masalle_coaches";
+const KEY_ATHLETES = "masalle_athletes";
+
+function uid() { return "id-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8); }
+
+// ============================================================
+//  AUTHENTIFICATION
+// ============================================================
+const Auth = {
+  async user() {
+    if (MODE_DEMO) return LS.get(KEY_SESSION, null);
+    const { data } = await sb.auth.getUser();
+    return data.user;
+  },
+
+  async signInGoogle() {
+    if (MODE_DEMO) {
+      throw new Error("La connexion Google nécessite Supabase. Configure-le (voir README) ou utilise le mode démo ci-dessous.");
+    }
+    const { error } = await sb.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.href.split("#")[0] },
+    });
+    if (error) throw error;
+  },
+
+  async signUpEmail(email, password) {
+    if (MODE_DEMO) return Auth._demoLogin(email);
+    const { data, error } = await sb.auth.signUp({
+      email, password,
+      options: { emailRedirectTo: window.location.href.split("#")[0] },
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  async signInEmail(email, password) {
+    if (MODE_DEMO) return Auth._demoLogin(email);
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    return data;
+  },
+
+  // Connexion factice pour le mode démo
+  _demoLogin(email) {
+    const session = { id: "demo-" + btoa(email).slice(0, 12), email, demo: true };
+    LS.set(KEY_SESSION, session);
+    return { user: session };
+  },
+
+  async signOut() {
+    if (MODE_DEMO) { localStorage.removeItem(KEY_SESSION); return; }
+    await sb.auth.signOut();
+  },
+};
+
+// ============================================================
+//  PROFIL DU COACH
+// ============================================================
+const Profile = {
+  async get(userId) {
+    if (MODE_DEMO) {
+      const coaches = LS.get(KEY_COACHES, {});
+      return coaches[userId] || null;
+    }
+    const { data, error } = await sb.from("coaches").select("*").eq("id", userId).maybeSingle();
+    if (error) throw error;
+    return data;
+  },
+
+  async save(userId, infos) {
+    if (MODE_DEMO) {
+      const coaches = LS.get(KEY_COACHES, {});
+      coaches[userId] = { id: userId, ...(coaches[userId] || {}), ...infos, profil_complet: true };
+      LS.set(KEY_COACHES, coaches);
+      return coaches[userId];
+    }
+    const payload = { id: userId, ...infos, profil_complet: true };
+    const { data, error } = await sb.from("coaches").upsert(payload).select().single();
+    if (error) throw error;
+    return data;
+  },
+};
+
+// ============================================================
+//  ATHLÈTES
+// ============================================================
+const Athletes = {
+  async list(coachId) {
+    if (MODE_DEMO) {
+      const all = LS.get(KEY_ATHLETES, {});
+      return (all[coachId] || []).slice().sort((a, b) => (a.nom || "").localeCompare(b.nom || ""));
+    }
+    const { data, error } = await sb.from("athletes").select("*").eq("coach_id", coachId).order("nom");
+    if (error) throw error;
+    return data;
+  },
+
+  async add(coachId, infos) {
+    const calc = calculerRenouvellement(null, infos.date_paiement || aujourdhui());
+    const athlete = {
+      coach_id: coachId,
+      nom: infos.nom, prenom: infos.prenom,
+      telephone: infos.telephone || null,
+      photo_url: infos.photo_url || null,
+      ...calc,
+    };
+    if (MODE_DEMO) {
+      const all = LS.get(KEY_ATHLETES, {});
+      all[coachId] = all[coachId] || [];
+      athlete.id = uid();
+      athlete.cree_le = new Date().toISOString();
+      all[coachId].push(athlete);
+      LS.set(KEY_ATHLETES, all);
+      return athlete;
+    }
+    const { data, error } = await sb.from("athletes").insert(athlete).select().single();
+    if (error) throw error;
+    return data;
+  },
+
+  async update(coachId, id, infos) {
+    if (MODE_DEMO) {
+      const all = LS.get(KEY_ATHLETES, {});
+      const arr = all[coachId] || [];
+      const i = arr.findIndex((a) => a.id === id);
+      if (i >= 0) { arr[i] = { ...arr[i], ...infos }; LS.set(KEY_ATHLETES, all); return arr[i]; }
+      return null;
+    }
+    const { data, error } = await sb.from("athletes").update(infos).eq("id", id).select().single();
+    if (error) throw error;
+    return data;
+  },
+
+  async remove(coachId, id) {
+    if (MODE_DEMO) {
+      const all = LS.get(KEY_ATHLETES, {});
+      all[coachId] = (all[coachId] || []).filter((a) => a.id !== id);
+      LS.set(KEY_ATHLETES, all);
+      return;
+    }
+    const { error } = await sb.from("athletes").delete().eq("id", id);
+    if (error) throw error;
+  },
+
+  // Enregistre un nouveau paiement (renouvellement) et applique la fidélité
+  async recordPayment(coachId, athlete, datePaiement) {
+    const calc = calculerRenouvellement(athlete, datePaiement);
+    await this.update(coachId, athlete.id, calc);
+
+    if (!MODE_DEMO) {
+      await sb.from("paiements").insert({
+        athlete_id: athlete.id, coach_id: coachId,
+        date_paiement: calc.date_paiement, date_fin: calc.date_prochain_paiement,
+        mois_consecutifs: calc.mois_consecutifs, bonus_applique: calc.bonus_actif,
+      });
+    }
+    return calc;
+  },
+};
+
+// ============================================================
+//  PHOTOS
+// ============================================================
+const Photos = {
+  // Retourne une URL utilisable (upload Supabase, sinon data-URL locale)
+  async upload(file, dossier) {
+    if (!file) return null;
+    if (MODE_DEMO || !sb) return await this._toDataURL(file);
+    try {
+      const nom = `${dossier}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      const { error } = await sb.storage.from("photos").upload(nom, file, { upsert: true });
+      if (error) throw error;
+      const { data } = sb.storage.from("photos").getPublicUrl(nom);
+      return data.publicUrl;
+    } catch (e) {
+      console.warn("Upload cloud échoué, photo gardée en local :", e.message);
+      return await this._toDataURL(file);
+    }
+  },
+  _toDataURL(file) {
+    return new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result);
+      r.onerror = rej;
+      r.readAsDataURL(file);
+    });
+  },
+};

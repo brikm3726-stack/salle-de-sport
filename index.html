@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ma Salle — Gestion des athlètes</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="bg-hero"></div>
+
+  <!-- Bandeau mode démo -->
+  <div id="demoBar" class="demo-bar hidden">
+    🟡 <b>Mode démo</b> — les données sont gardées dans ce navigateur. Configure Supabase (voir README) pour les vrais comptes Google + sauvegarde cloud.
+  </div>
+
+  <!-- ================= BARRE DU HAUT ================= -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">🏋️</div>
+      <div><b>MA SALLE</b><span>GYM MANAGER</span></div>
+    </div>
+    <div class="topbar-right" id="topRight"></div>
+  </header>
+
+  <!-- ================= VUE : CONNEXION ================= -->
+  <section id="view-auth" class="center-screen hidden">
+    <div class="card auth-card pad">
+      <div class="auth-head">
+        <div class="big">Bienvenue à <em>Ma Salle</em></div>
+        <p>Gère les abonnements de tes athlètes en toute simplicité.</p>
+      </div>
+
+      <button class="btn btn-google" id="btnGoogle">
+        <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.7 30.1 0 24 0 14.6 0 6.4 5.4 2.5 13.3l7.8 6.1C12.2 13.6 17.6 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.6c0-1.6-.1-3.1-.4-4.6H24v9.1h12.4c-.5 2.9-2.1 5.3-4.6 7l7.1 5.5c4.2-3.9 6.6-9.6 6.6-16z"/><path fill="#FBBC05" d="M10.3 28.4c-.5-1.4-.7-2.9-.7-4.4s.3-3 .7-4.4l-7.8-6.1C.9 16.5 0 20.1 0 24s.9 7.5 2.5 10.5l7.8-6.1z"/><path fill="#34A853" d="M24 48c6.1 0 11.3-2 15-5.5l-7.1-5.5c-2 1.4-4.6 2.2-7.9 2.2-6.4 0-11.8-4.1-13.7-9.9l-7.8 6.1C6.4 42.6 14.6 48 24 48z"/></svg>
+        Continuer avec Google
+      </button>
+
+      <div class="divider">ou par email</div>
+
+      <div class="tabs">
+        <button id="tabLogin" class="on">Connexion</button>
+        <button id="tabSignup">Inscription</button>
+      </div>
+
+      <form id="authForm">
+        <label>Email</label>
+        <input type="email" id="authEmail" placeholder="ton.email@gmail.com" required />
+        <label>Mot de passe</label>
+        <input type="password" id="authPass" placeholder="••••••••" minlength="6" required />
+        <button type="submit" class="btn btn-primary btn-block" id="authSubmit" style="margin-top:18px">Se connecter</button>
+      </form>
+
+      <div id="authMsg" class="msg"></div>
+    </div>
+  </section>
+
+  <!-- ================= VUE : PROFIL DU COACH ================= -->
+  <section id="view-profil" class="center-screen hidden">
+    <div class="card auth-card pad">
+      <div class="auth-head">
+        <div class="big">Ton <em>profil</em> coach</div>
+        <p>Remplis tes informations pour ouvrir ton espace.</p>
+      </div>
+
+      <form id="profilForm">
+        <div class="photo-pick">
+          <label class="photo-preview" for="profilPhoto" style="margin:0" id="profilPhotoBox">📷</label>
+          <div style="flex:1">
+            <label style="margin-top:0">Photo de profil</label>
+            <input type="file" id="profilPhoto" accept="image/*" />
+          </div>
+        </div>
+
+        <div class="row2">
+          <div><label>Nom</label><input id="pNom" required /></div>
+          <div><label>Prénom</label><input id="pPrenom" required /></div>
+        </div>
+        <label>Nom de la salle</label>
+        <input id="pSalle" placeholder="Ex : Titan Gym" />
+        <div class="row2">
+          <div><label>Téléphone</label><input id="pTel" placeholder="0X XX XX XX XX" /></div>
+          <div><label>Nombre d'athlètes</label><input id="pNb" type="number" min="0" value="0" /></div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top:22px">Ouvrir mon espace 🚀</button>
+      </form>
+      <div id="profilMsg" class="msg"></div>
+    </div>
+  </section>
+
+  <!-- ================= VUE : TABLEAU DE BORD ================= -->
+  <section id="view-dashboard" class="hidden">
+    <div class="wrap">
+      <div class="dash-head">
+        <h1 id="dashTitle">Mes <em>athlètes</em></h1>
+        <button class="btn btn-primary" id="btnAdd">＋ Nouvel athlète</button>
+      </div>
+
+      <div class="stats" id="stats"></div>
+
+      <div class="toolbar">
+        <input class="search" id="search" placeholder="🔍 Rechercher un athlète..." />
+      </div>
+
+      <div id="listZone"></div>
+    </div>
+  </section>
+
+  <!-- ================= MODALE ATHLÈTE ================= -->
+  <div id="overlay" class="overlay hidden">
+    <div class="card modal">
+      <div class="modal-head">
+        <h3 id="modalTitle">Nouvel athlète</h3>
+        <button class="close" id="modalClose">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="athleteForm">
+          <div class="photo-pick">
+            <label class="photo-preview" for="aPhoto" style="margin:0" id="aPhotoBox">📷</label>
+            <div style="flex:1">
+              <label style="margin-top:0">Photo de l'athlète</label>
+              <input type="file" id="aPhoto" accept="image/*" />
+            </div>
+          </div>
+          <div class="row2">
+            <div><label>Nom</label><input id="aNom" required /></div>
+            <div><label>Prénom</label><input id="aPrenom" required /></div>
+          </div>
+          <div class="row2">
+            <div><label>Téléphone</label><input id="aTel" placeholder="Optionnel" /></div>
+            <div><label>Date du paiement</label><input id="aDate" type="date" required /></div>
+          </div>
+          <div id="athleteMsg" class="msg"></div>
+          <button type="submit" class="btn btn-primary btn-block" style="margin-top:20px" id="athleteSubmit">Enregistrer</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODALE PAIEMENT ================= -->
+  <div id="overlayPay" class="overlay hidden">
+    <div class="card modal" style="max-width:440px">
+      <div class="modal-head">
+        <h3>💳 Enregistrer un paiement</h3>
+        <button class="close" id="payClose">×</button>
+      </div>
+      <div class="modal-body">
+        <p id="payWho" style="color:var(--muted);margin-bottom:6px"></p>
+        <label>Date du paiement</label>
+        <input id="payDate" type="date" />
+        <div id="payPreview" class="msg info show" style="margin-top:16px"></div>
+        <button class="btn btn-primary btn-block" id="payConfirm" style="margin-top:18px">Confirmer le paiement</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
