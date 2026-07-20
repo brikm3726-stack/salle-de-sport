@@ -155,6 +155,64 @@
     </div>
   </div>
 
+  <!-- ================= MODALE ABONNEMENT (du coach) ================= -->
+  <div id="overlaySub" class="overlay hidden">
+    <div class="card modal">
+      <div class="modal-head">
+        <h3>⭐ Abonnement Ma Salle</h3>
+        <button class="close" id="subClose">×</button>
+      </div>
+      <div class="modal-body">
+        <p style="color:var(--muted);margin-bottom:18px">Choisis ta formule pour continuer à utiliser l'application.</p>
+
+        <div class="plans">
+          <button class="plan" data-plan="mensuel">
+            <div class="plan-tag">MENSUEL</div>
+            <div class="plan-price">1200<span>DA</span></div>
+            <div class="plan-per">par mois</div>
+          </button>
+          <button class="plan on" data-plan="annuel">
+            <div class="plan-best">RECOMMANDÉ</div>
+            <div class="plan-tag">ANNUEL</div>
+            <div class="plan-price">19000<span>DA</span></div>
+            <div class="plan-per">par an</div>
+          </button>
+        </div>
+
+        <div class="pay-title">💳 Moyens de paiement</div>
+
+        <div class="pay-method">
+          <div class="pay-ico" style="background:linear-gradient(135deg,#00843d,#00a651)">BM</div>
+          <div class="pay-info">
+            <b>Baridi Mob</b>
+            <div class="pay-account">
+              <code id="rip">00799999004120286181</code>
+              <button class="icon-btn" id="copyRip" title="Copier">📋</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="pay-method">
+          <div class="pay-ico" style="background:linear-gradient(135deg,#7b2ff7,#f107a3)">R</div>
+          <div class="pay-info"><b>RedotPay</b><small>Paiement par carte / crypto</small></div>
+        </div>
+
+        <div class="pay-method">
+          <div class="pay-ico" style="background:linear-gradient(135deg,#003087,#009cde)">P</div>
+          <div class="pay-info"><b>PayPal</b><small>Paiement international</small></div>
+        </div>
+
+        <div id="subMsg" class="msg info" style="margin-top:16px"></div>
+        <button class="btn btn-primary btn-block" id="subConfirm" style="margin-top:18px">
+          J'ai payé — envoyer la preuve 📤
+        </button>
+        <p style="color:var(--muted);font-size:12px;text-align:center;margin-top:12px">
+          Après paiement, envoie la capture au coach responsable pour activer ton compte.
+        </p>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js"></script>

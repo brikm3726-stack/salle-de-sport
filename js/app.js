@@ -64,8 +64,10 @@ function renderTop() {
     ? `<img src="${p.avatar_url}" alt="">`
     : `<span class="ph">${(p.prenom || "C")[0].toUpperCase()}</span>`;
   zone.innerHTML = `
+    <button class="btn btn-sub btn-sm" id="btnSub">⭐ Abonnement</button>
     <div class="coach-chip">${av}<span>${nom}</span></div>
     <button class="btn btn-ghost btn-sm" id="btnLogout">Déconnexion</button>`;
+  $("#btnSub").onclick = ouvrirAbonnement;
   $("#btnLogout").onclick = async () => { await Auth.signOut(); location.reload(); };
 }
 
@@ -377,6 +379,42 @@ function brancherPaiement() {
 }
 
 // ============================================================
+//  MODALE ABONNEMENT (le coach paie l'app)
+// ============================================================
+let planChoisi = "annuel";
+
+function ouvrirAbonnement() {
+  $("#overlaySub").classList.remove("hidden");
+}
+function fermerAbonnement() { $("#overlaySub").classList.add("hidden"); }
+
+function brancherAbonnement() {
+  $("#subClose").onclick = fermerAbonnement;
+  $("#overlaySub").onclick = (e) => { if (e.target.id === "overlaySub") fermerAbonnement(); };
+
+  $$("#overlaySub .plan").forEach((p) => {
+    p.onclick = () => {
+      planChoisi = p.dataset.plan;
+      $$("#overlaySub .plan").forEach((x) => x.classList.toggle("on", x === p));
+    };
+  });
+
+  $("#copyRip").onclick = async () => {
+    const rip = $("#rip").textContent.trim();
+    try { await navigator.clipboard.writeText(rip); } catch {}
+    $("#copyRip").textContent = "✅";
+    setTimeout(() => ($("#copyRip").textContent = "📋"), 1500);
+  };
+
+  $("#subConfirm").onclick = () => {
+    const prix = planChoisi === "annuel" ? "19000 DA / an" : "1200 DA / mois";
+    message($("#subMsg"),
+      `✅ Formule ${planChoisi} (${prix}) sélectionnée. Envoie la capture de ton paiement Baridi Mob / RedotPay / PayPal pour activer ton compte.`,
+      "ok");
+  };
+}
+
+// ============================================================
 //  BRANCHEMENTS
 // ============================================================
 function brancherEvenements() {
@@ -384,6 +422,7 @@ function brancherEvenements() {
   brancherProfil();
   brancherModale();
   brancherPaiement();
+  brancherAbonnement();
   $("#search").oninput = (e) => { ETAT.filtre = e.target.value; renderListe(); };
 }
 
