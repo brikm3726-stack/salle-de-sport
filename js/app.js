@@ -199,7 +199,7 @@ function renderStats() {
   $("#stats").innerHTML = `
     <div class="stat accent"><div class="n">${A.length}</div><div class="l">Athlètes</div></div>
     <div class="stat green"><div class="n">${actifs}</div><div class="l">Abonnements actifs</div></div>
-    <div class="stat"><div class="n" style="color:#ff8080">${expires}</div><div class="l">Expirés</div></div>
+    <div class="stat red"><div class="n">${expires}</div><div class="l">Expirés</div></div>
     <div class="stat gold"><div class="n">${bonus}</div><div class="l">Bonus fidélité 🎁</div></div>`;
 }
 
