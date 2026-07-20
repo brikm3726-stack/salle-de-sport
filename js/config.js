@@ -14,8 +14,8 @@
 // ------------------------------------------------------------
 
 const SUPABASE_CONFIG = {
-  url: "https://VOTRE-PROJET.supabase.co", // ← colle ton "Project URL"
-  anonKey: "VOTRE_CLE_ANON_PUBLIC_ICI",    // ← colle ta clé "anon public"
+  url: "https://maorlngzpldhzssoujqu.supabase.co",
+  anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hb3Jsbmd6cGxkaHpzc291anF1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ1NjMxOTMsImV4cCI6MjEwMDEzOTE5M30.Z93FHGeeWL0w8CJ0BAcMQLFF_-Jp5Wxjpl6QxgYvEDw",
 };
 
 // ---- Réglages de l'abonnement ----
