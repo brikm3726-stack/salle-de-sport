@@ -401,7 +401,9 @@ function listeFiltree() {
   const q = ETAT.filtre.toLowerCase();
   let l = ETAT.athletes.filter((a) =>
     (a.nom + " " + a.prenom + " " + (a.telephone || "")).toLowerCase().includes(q));
-  if (ETAT.statut !== "tous") l = l.filter((a) => statutAbo(a).cls === ETAT.statut);
+  // Correspondance filtre (chip) → statut interne
+  const mapStatut = { actif: "ok", bientot: "warn", expire: "exp" };
+  if (ETAT.statut !== "tous") l = l.filter((a) => statutAbo(a).cls === mapStatut[ETAT.statut]);
   const tri = ETAT.tri;
   l.sort((a, b) => {
     if (tri === "expire") return joursRestants(a.date_prochain_paiement) - joursRestants(b.date_prochain_paiement);
