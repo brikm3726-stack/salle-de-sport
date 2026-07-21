@@ -114,12 +114,52 @@ const Abonnement = {
     return all[coachId];
   },
   get(coachId) { return this._all()[coachId] || null; },
-  estActif(coachId) { return !!(this.get(coachId)?.actif); },
-  activer(coachId) {
+
+  // Nombre de jours d'abonnement selon le plan (null = à vie / illimité).
+  dureePlan(plan) {
+    if (plan === "mensuel") return 30;
+    if (plan === "annuel") return 365;
+    return null; // avie
+  },
+  // Déduit le plan à partir du préfixe du code.
+  planDuCode(code) {
+    const c = (code || "").toUpperCase();
+    if (c.startsWith("MS-M-")) return "mensuel";
+    if (c.startsWith("MS-A-")) return "annuel";
+    if (c.startsWith("MS-V-")) return "avie";
+    return null;
+  },
+
+  // Active l'abonnement du coach avec une date d'expiration selon le plan.
+  activer(coachId, plan = "avie") {
     const all = this._all();
-    all[coachId] = { debut: all[coachId]?.debut || new Date().toISOString(), actif: true };
+    const duree = this.dureePlan(plan);
+    const now = Date.now();
+    all[coachId] = {
+      debut: all[coachId]?.debut || new Date().toISOString(),
+      actif: true,
+      plan,
+      activeLe: new Date(now).toISOString(),
+      expireLe: duree ? new Date(now + duree * 86400000).toISOString() : null,
+    };
     LS.set(KEY_ESSAI, all);
   },
+
+  // Abonnement actuellement valide ? (à vie = toujours ; sinon avant expiration)
+  estActif(coachId) {
+    const i = this.get(coachId);
+    if (!i?.actif) return false;
+    if (!i.expireLe) return true;
+    return Date.now() < new Date(i.expireLe).getTime();
+  },
+  // ms avant expiration de l'abonnement payant (null si à vie ou pas d'abo).
+  msAvantExpiration(coachId) {
+    const i = this.get(coachId);
+    if (!i?.actif || !i.expireLe) return null;
+    return new Date(i.expireLe).getTime() - Date.now();
+  },
+
+  // --- Essai gratuit (avant tout abonnement) ---
   finTimestamp(coachId) {
     const info = this.get(coachId);
     if (!info) return null;
@@ -129,23 +169,31 @@ const Abonnement = {
     const fin = this.finTimestamp(coachId);
     return fin == null ? null : fin - Date.now();
   },
+
+  // Compte bloqué ? (abo expiré, ou essai terminé sans abonnement)
   estBloque(coachId) {
-    if (this.estActif(coachId)) return false;
-    const ms = this.msRestant(coachId);
+    const i = this.get(coachId);
+    if (i?.actif) {
+      if (!i.expireLe) return false;                 // à vie
+      return Date.now() >= new Date(i.expireLe).getTime(); // abo expiré
+    }
+    const ms = this.msRestant(coachId);              // essai
     return ms != null && ms <= 0;
   },
+
   // Tente d'utiliser un code d'activation (USAGE UNIQUE).
-  //  Retour : { ok:true } | { ok:false, raison:"invalide"|"deja" }
+  //  Retour : { ok:true, plan } | { ok:false, raison:"invalide"|"deja" }
   async utiliserCode(coachId, codeRaw) {
     const code = (codeRaw || "").trim().toUpperCase();
     const pool = ACTIVATION_CODES.map((c) => c.trim().toUpperCase());
-    if (!pool.includes(code)) return { ok: false, raison: "invalide" };
+    const plan = this.planDuCode(code);
+    if (!pool.includes(code) || !plan) return { ok: false, raison: "invalide" };
 
     // 1) Supabase : usage unique GLOBAL (une ligne = un code brûlé)
     if (sb) {
       try {
         const { error } = await sb.from("codes_utilises").insert({ code, coach_id: coachId });
-        if (!error) { this.activer(coachId); return { ok: true }; }
+        if (!error) { this.activer(coachId, plan); return { ok: true, plan }; }
         if (error.code === "23505") return { ok: false, raison: "deja" }; // clé déjà présente
         // table absente / autre erreur → on retombe sur le repli local
       } catch (e) { /* repli local */ }
@@ -156,8 +204,8 @@ const Abonnement = {
     if (used[code]) return { ok: false, raison: "deja" };
     used[code] = { coach_id: coachId, le: new Date().toISOString() };
     LS.set(KEY_CODES, used);
-    this.activer(coachId);
-    return { ok: true };
+    this.activer(coachId, plan);
+    return { ok: true, plan };
   },
 };
 

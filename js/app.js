@@ -744,29 +744,59 @@ function formatDuree(ms) {
   return `${h}h ${String(m).padStart(2, "0")}min`;
 }
 
+function stopTrialTimer() { if (trialTimer) { clearInterval(trialTimer); trialTimer = null; } }
+
+function afficherBlocage(type) {
+  const expire = type === "expire";
+  $("#bloqueTitre").textContent = expire ? "Ton abonnement a expiré" : "Ton essai gratuit est terminé";
+  $("#bloqueTexte").innerHTML = expire
+    ? "Renouvelle ton abonnement pour continuer à utiliser <b>Ma Salle</b> et accéder à tes athlètes."
+    : "Pour continuer à utiliser <b>Ma Salle</b> et accéder à tes athlètes, active ton compte en choisissant une formule.";
+  $("#bloqueVoir").textContent = expire ? "⭐ Renouveler mon abonnement" : "⭐ Voir les formules & payer";
+  $("#trialBar").classList.add("hidden");
+  $("#overlayBloque").classList.remove("hidden");
+  stopTrialTimer();
+}
+
 function renderTrial() {
   const id = ETAT.user?.id;
   if (!id) return;
   const bar = $("#trialBar");
   const bloque = $("#overlayBloque");
+  const info = Abonnement.get(id);
 
-  if (Abonnement.estActif(id)) {                 // compte payé/activé
+  // 1) Abonnement à vie → aucun rappel
+  if (info?.actif && !info.expireLe) {
     bar.classList.add("hidden");
     bloque.classList.add("hidden");
-    if (trialTimer) { clearInterval(trialTimer); trialTimer = null; }
+    stopTrialTimer();
     return;
   }
+
+  // 2) Abonnement mensuel / annuel
+  if (info?.actif && info.plan) {
+    const ms = Abonnement.msAvantExpiration(id);
+    if (ms != null && ms <= 0) { afficherBlocage("expire"); return; } // expiré
+    bloque.classList.add("hidden");
+    const nom = info.plan === "annuel" ? "annuel" : "mensuel";
+    $("#trialIco").textContent = "⭐";
+    $("#trialTitre").textContent = `Abonnement ${nom} actif`;
+    $("#trialTime").textContent = `Expire dans ${formatDuree(ms)}.`;
+    $("#trialActiver").textContent = "Renouveler";
+    bar.classList.remove("hidden");
+    bar.classList.toggle("urgent", ms < 3 * 24 * 3600 * 1000); // urgent < 3 jours
+    return;
+  }
+
+  // 3) Pas d'abonnement → essai gratuit 72h
   const ms = Abonnement.msRestant(id);
-  if (ms != null && ms <= 0) {                   // essai terminé → blocage
-    bar.classList.add("hidden");
-    bloque.classList.remove("hidden");
-    if (trialTimer) { clearInterval(trialTimer); trialTimer = null; }
-    return;
-  }
-  // En cours d'essai
+  if (ms != null && ms <= 0) { afficherBlocage("essai"); return; }
   bloque.classList.add("hidden");
-  bar.classList.remove("hidden");
+  $("#trialIco").textContent = "🎁";
+  $("#trialTitre").textContent = "Version d'essai gratuite";
   $("#trialTime").textContent = `Il te reste ${formatDuree(ms)} avant de payer l'abonnement.`;
+  $("#trialActiver").textContent = "Activer mon compte";
+  bar.classList.remove("hidden");
   bar.classList.toggle("urgent", ms < 12 * 3600 * 1000);
 }
 
@@ -791,11 +821,13 @@ function brancherTrial() {
           : "❌ Code invalide. Vérifie avec le responsable.", "err");
         return;
       }
-      message($("#activMsg"), "✅ Compte activé ! Merci 🎉", "ok");
+      const nomPlan = res.plan === "mensuel" ? "mensuel (1 mois)"
+        : res.plan === "annuel" ? "annuel (1 an)" : "à vie";
+      message($("#activMsg"), `✅ Abonnement ${nomPlan} activé ! Merci 🎉`, "ok");
       setTimeout(() => {
         fermerAbonnement();
         renderTrial();
-        toast("Compte activé — accès complet débloqué 🎉");
+        toast(`Abonnement ${nomPlan} activé 🎉`);
       }, 900);
     } finally {
       btn.disabled = false; btn.textContent = "Activer";

@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=10" />
+  <link rel="stylesheet" href="css/styles.css?v=11" />
 </head>
 <body>
   <div class="bg-hero"></div>
@@ -133,9 +133,9 @@
       <!-- Bannière essai gratuit -->
       <div id="trialBar" class="trial-bar hidden">
         <div class="tb-left">
-          <span class="tb-ico">🎁</span>
+          <span class="tb-ico" id="trialIco">🎁</span>
           <div class="tb-txt">
-            <b>Version d'essai gratuite</b>
+            <b id="trialTitre">Version d'essai gratuite</b>
             <small id="trialTime">—</small>
           </div>
         </div>
@@ -407,8 +407,8 @@
     <div class="card modal" style="max-width:440px">
       <div class="modal-body confirm-body">
         <div class="lock-ico">🔒</div>
-        <h3>Ton essai gratuit est terminé</h3>
-        <p class="modal-sub">Pour continuer à utiliser <b>Ma Salle</b> et accéder à tes athlètes, active ton compte en choisissant une formule.</p>
+        <h3 id="bloqueTitre">Ton essai gratuit est terminé</h3>
+        <p class="modal-sub" id="bloqueTexte">Pour continuer à utiliser <b>Ma Salle</b> et accéder à tes athlètes, active ton compte en choisissant une formule.</p>
         <button class="btn btn-primary btn-block" id="bloqueVoir" style="margin-top:20px">⭐ Voir les formules & payer</button>
         <button class="btn btn-ghost btn-block btn-sm" id="bloqueLogout" style="margin-top:10px">Déconnexion</button>
       </div>
@@ -420,8 +420,8 @@
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/config.js?v=10"></script>
-  <script src="js/db.js?v=10"></script>
-  <script src="js/app.js?v=10"></script>
+  <script src="js/config.js?v=11"></script>
+  <script src="js/db.js?v=11"></script>
+  <script src="js/app.js?v=11"></script>
 </body>
 </html>
