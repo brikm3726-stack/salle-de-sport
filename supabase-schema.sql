@@ -49,6 +49,22 @@ create table if not exists paiements (
   cree_le          timestamptz default now()
 );
 
+-- ---------- CODES D'ACTIVATION UTILISÉS (usage unique) ----------
+--  Une ligne = un code déjà utilisé (donc "brûlé", non réutilisable).
+--  La clé primaire sur "code" garantit qu'un même code ne peut pas
+--  être inséré 2 fois → usage unique GLOBAL (tous appareils).
+create table if not exists codes_utilises (
+  code        text primary key,
+  coach_id    text,
+  utilise_le  timestamptz default now()
+);
+alter table codes_utilises enable row level security;
+--  On autorise seulement l'INSERTION (pas la lecture/suppression) au public :
+--  un visiteur peut "brûler" un code mais ne peut pas voir ni réinitialiser la liste.
+drop policy if exists "bruler un code" on codes_utilises;
+create policy "bruler un code" on codes_utilises
+  for insert to anon, authenticated with check (true);
+
 -- ============================================================
 --  SÉCURITÉ (RLS) : chaque coach ne voit QUE ses données
 -- ============================================================

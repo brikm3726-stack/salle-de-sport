@@ -101,6 +101,7 @@ const Settings = {
 //  Stocké par coach dans le navigateur : { debut, actif }.
 // ------------------------------------------------------------
 const KEY_ESSAI = "masalle_essai";
+const KEY_CODES = "masalle_codes_utilises";
 const Abonnement = {
   _all() { return LS.get(KEY_ESSAI, {}); },
   // Démarre l'essai la 1re fois (idempotent : ne réinitialise jamais).
@@ -133,9 +134,30 @@ const Abonnement = {
     const ms = this.msRestant(coachId);
     return ms != null && ms <= 0;
   },
-  // Vérifie un code d'activation saisi par le coach.
-  verifierCode(code) {
-    return (code || "").trim().toUpperCase() === String(ACTIVATION_CODE).trim().toUpperCase();
+  // Tente d'utiliser un code d'activation (USAGE UNIQUE).
+  //  Retour : { ok:true } | { ok:false, raison:"invalide"|"deja" }
+  async utiliserCode(coachId, codeRaw) {
+    const code = (codeRaw || "").trim().toUpperCase();
+    const pool = ACTIVATION_CODES.map((c) => c.trim().toUpperCase());
+    if (!pool.includes(code)) return { ok: false, raison: "invalide" };
+
+    // 1) Supabase : usage unique GLOBAL (une ligne = un code brûlé)
+    if (sb) {
+      try {
+        const { error } = await sb.from("codes_utilises").insert({ code, coach_id: coachId });
+        if (!error) { this.activer(coachId); return { ok: true }; }
+        if (error.code === "23505") return { ok: false, raison: "deja" }; // clé déjà présente
+        // table absente / autre erreur → on retombe sur le repli local
+      } catch (e) { /* repli local */ }
+    }
+
+    // 2) Repli local (mode démo ou Supabase indisponible)
+    const used = LS.get(KEY_CODES, {});
+    if (used[code]) return { ok: false, raison: "deja" };
+    used[code] = { coach_id: coachId, le: new Date().toISOString() };
+    LS.set(KEY_CODES, used);
+    this.activer(coachId);
+    return { ok: true };
   },
 };
 

@@ -762,19 +762,27 @@ function brancherTrial() {
   $("#trialActiver").onclick = ouvrirAbonnement;
   $("#bloqueVoir").onclick = ouvrirAbonnement;
   $("#bloqueLogout").onclick = async () => { await Auth.signOut(); location.reload(); };
-  $("#btnActiver").onclick = () => {
+  $("#btnActiver").onclick = async () => {
     const code = $("#codeActivation").value;
-    if (!Abonnement.verifierCode(code)) {
-      message($("#activMsg"), "❌ Code incorrect. Vérifie avec le responsable.", "err");
-      return;
+    const btn = $("#btnActiver"); btn.disabled = true; btn.textContent = "...";
+    cacher($("#activMsg"));
+    try {
+      const res = await Abonnement.utiliserCode(ETAT.user.id, code);
+      if (!res.ok) {
+        message($("#activMsg"), res.raison === "deja"
+          ? "❌ Ce code a déjà été utilisé. Demande un nouveau code au responsable."
+          : "❌ Code invalide. Vérifie avec le responsable.", "err");
+        return;
+      }
+      message($("#activMsg"), "✅ Compte activé ! Merci 🎉", "ok");
+      setTimeout(() => {
+        fermerAbonnement();
+        renderTrial();
+        toast("Compte activé — accès complet débloqué 🎉");
+      }, 900);
+    } finally {
+      btn.disabled = false; btn.textContent = "Activer";
     }
-    Abonnement.activer(ETAT.user.id);
-    message($("#activMsg"), "✅ Compte activé ! Merci 🎉", "ok");
-    setTimeout(() => {
-      fermerAbonnement();
-      renderTrial();
-      toast("Compte activé — accès complet débloqué 🎉");
-    }, 900);
   };
 }
 

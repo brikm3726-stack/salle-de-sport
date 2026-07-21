@@ -25,9 +25,17 @@ const WHATSAPP_PREUVE = "213792779320";
 // ---- Essai gratuit + activation ----
 //  Durée de l'essai gratuit (en heures) après l'inscription.
 const ESSAI_HEURES = 72;
-//  Code SECRET que TU donnes au coach après avoir vérifié son paiement.
-//  Change-le pour ce que tu veux (garde-le confidentiel).
-const ACTIVATION_CODE = "MASALLE-VIP";
+
+//  POOL DE CODES D'ACTIVATION — chaque code ne marche QU'UNE SEULE FOIS.
+//  Tu donnes UN code à chaque coach qui a payé (vérifié via WhatsApp).
+//  Une fois utilisé, le code est "brûlé" et ne remarche plus (même ailleurs).
+//  Ajoute-en autant que tu veux (garde cette liste confidentielle).
+const ACTIVATION_CODES = [
+  "MS-7K2P9", "MS-4X8M3", "MS-9QW5R", "MS-2N6TB", "MS-5HJ7L",
+  "MS-8ZP3C", "MS-3RF6V", "MS-6BK9D", "MS-1TY4W", "MS-0LM8S",
+  "MS-QX72A", "MS-KP39E", "MS-VT56N", "MS-RB84H", "MS-JD27U",
+  "MS-WF63Y", "MS-ZC91G", "MS-NM48K", "MS-HP35Q", "MS-LS70X",
+];
 
 // ---- Réglages de l'abonnement ----
 const REGLES = {
