@@ -710,6 +710,15 @@ function brancherAbonnement() {
     toast("RIP copié 📋", "info");
   };
 
+  $("#copyRedot").onclick = async (e) => {
+    e.stopPropagation();
+    const rid = $("#ridRedot").textContent.trim();
+    try { await navigator.clipboard.writeText(rid); } catch {}
+    $("#copyRedot").textContent = "✅";
+    setTimeout(() => ($("#copyRedot").textContent = "📋"), 1500);
+    toast("ID RedotPay copié 📋", "info");
+  };
+
   $("#subConfirm").onclick = () => {
     const prix = PLAN_PRIX[planChoisi] || PLAN_PRIX.avie;
     const p = ETAT.profil || {};

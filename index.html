@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=12" />
+  <link rel="stylesheet" href="css/styles.css?v=13" />
 </head>
 <body>
   <div class="bg-hero"></div>
@@ -370,7 +370,13 @@
 
         <button class="pay-method" data-method="RedotPay">
           <div class="pay-ico" style="padding:0;overflow:hidden"><img src="redotpay-logo.png" alt="RedotPay" style="width:100%;height:100%;object-fit:cover"></div>
-          <div class="pay-info"><b>RedotPay</b><small>Paiement par carte / crypto</small></div>
+          <div class="pay-info">
+            <b>RedotPay</b>
+            <div class="pay-account">
+              <code id="ridRedot">1698344204</code>
+              <span class="icon-btn" id="copyRedot" title="Copier">📋</span>
+            </div>
+          </div>
           <span class="pay-check">✓</span>
         </button>
 
@@ -420,8 +426,8 @@
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/config.js?v=12"></script>
-  <script src="js/db.js?v=12"></script>
-  <script src="js/app.js?v=12"></script>
+  <script src="js/config.js?v=13"></script>
+  <script src="js/db.js?v=13"></script>
+  <script src="js/app.js?v=13"></script>
 </body>
 </html>
