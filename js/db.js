@@ -124,9 +124,9 @@ const Abonnement = {
   // Déduit le plan à partir du préfixe du code.
   planDuCode(code) {
     const c = (code || "").toUpperCase();
-    if (c.startsWith("MS-M-")) return "mensuel";
-    if (c.startsWith("MS-A-")) return "annuel";
-    if (c.startsWith("MS-V-")) return "avie";
+    if (c.startsWith("MOIS-")) return "mensuel";
+    if (c.startsWith("ANNEE-")) return "annuel";
+    if (c.startsWith("VIE-")) return "avie";
     return null;
   },
 

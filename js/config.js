@@ -28,33 +28,33 @@ const ESSAI_HEURES = 72;
 
 //  POOL DE CODES D'ACTIVATION — chaque code ne marche QU'UNE SEULE FOIS.
 //  Le PRÉFIXE décide de la durée d'abonnement du coach :
-//    MS-M-xxxx = 1 mois  |  MS-A-xxxx = 1 an  |  MS-V-xxxx = à vie
+//    MOIS-xxxx = 1 mois  |  ANNEE-xxxx = 1 an  |  VIE-xxxx = à vie
 //  Tu donnes UN code au coach selon la formule qu'il a payée (vérifiée WhatsApp).
 //  Une fois utilisé, le code est "brûlé" et ne remarche plus (même ailleurs).
 const ACTIVATION_CODES = [
   // MENSUEL (1 mois) — 40 codes
-  "MS-M-JTFL", "MS-M-9BQL", "MS-M-4VA2", "MS-M-CSCK", "MS-M-Z96Q",
-  "MS-M-M7YC", "MS-M-LRH9", "MS-M-2STJ", "MS-M-B776", "MS-M-MRGK",
-  "MS-M-TGCY", "MS-M-DLJQ", "MS-M-SPE6", "MS-M-RXT5", "MS-M-RW36",
-  "MS-M-T495", "MS-M-H667", "MS-M-R3EH", "MS-M-HVGH", "MS-M-7GDG",
-  "MS-M-BP5J", "MS-M-5JZC", "MS-M-GM8R", "MS-M-SCSN", "MS-M-PGB3",
-  "MS-M-BVA2", "MS-M-LNUL", "MS-M-KJ8B", "MS-M-WU4N", "MS-M-N5VJ",
-  "MS-M-ZXR5", "MS-M-DXYQ", "MS-M-3RPP", "MS-M-HHVR", "MS-M-2GQ2",
-  "MS-M-BJCA", "MS-M-R59G", "MS-M-SNQC", "MS-M-9YMP", "MS-M-GLQZ",
+  "MOIS-TA6X", "MOIS-7G8U", "MOIS-VYHL", "MOIS-WMMH", "MOIS-NFFR",
+  "MOIS-TETM", "MOIS-U6NC", "MOIS-WT6E", "MOIS-FVYD", "MOIS-2WH9",
+  "MOIS-QS23", "MOIS-UWBW", "MOIS-E9H4", "MOIS-DEYL", "MOIS-8R6V",
+  "MOIS-775N", "MOIS-5GV5", "MOIS-3VC2", "MOIS-N9NZ", "MOIS-RDY2",
+  "MOIS-QTLF", "MOIS-VF7C", "MOIS-9HSH", "MOIS-BP7Z", "MOIS-2PVS",
+  "MOIS-MWQU", "MOIS-FRH5", "MOIS-ZGJ3", "MOIS-TNQB", "MOIS-MYTH",
+  "MOIS-GSXV", "MOIS-3UYV", "MOIS-4ES8", "MOIS-VHN7", "MOIS-B895",
+  "MOIS-P5G2", "MOIS-8EBX", "MOIS-RDH2", "MOIS-YCUB", "MOIS-Y8UY",
   // ANNUEL (1 an) — 30 codes
-  "MS-A-Y5BC", "MS-A-EKJA", "MS-A-NQCU", "MS-A-ZXDC", "MS-A-96PY",
-  "MS-A-CT5F", "MS-A-MA9Y", "MS-A-S58P", "MS-A-Z6NL", "MS-A-JWN9",
-  "MS-A-76F4", "MS-A-5YEJ", "MS-A-GMXW", "MS-A-CMQ7", "MS-A-MQE4",
-  "MS-A-9HS7", "MS-A-TWEB", "MS-A-8VFX", "MS-A-BP74", "MS-A-P7QD",
-  "MS-A-VV4V", "MS-A-L9PK", "MS-A-2FLB", "MS-A-28LS", "MS-A-V7VV",
-  "MS-A-VHTR", "MS-A-YS8A", "MS-A-98JC", "MS-A-GGS3", "MS-A-XFDN",
+  "ANNEE-CPSV", "ANNEE-7ZT4", "ANNEE-RA7R", "ANNEE-A3HJ", "ANNEE-SW5V",
+  "ANNEE-CZ8A", "ANNEE-DHT6", "ANNEE-Z2KR", "ANNEE-DQ6K", "ANNEE-XQQY",
+  "ANNEE-XKKH", "ANNEE-YNKY", "ANNEE-3ZWD", "ANNEE-HRET", "ANNEE-5NX8",
+  "ANNEE-HJWU", "ANNEE-VUJD", "ANNEE-C9HT", "ANNEE-F6VX", "ANNEE-KWER",
+  "ANNEE-WT44", "ANNEE-2WWD", "ANNEE-VT3H", "ANNEE-ECBP", "ANNEE-GBRR",
+  "ANNEE-LAQ7", "ANNEE-LZ3A", "ANNEE-H3LD", "ANNEE-6VHK", "ANNEE-TMQ7",
   // A VIE (illimité) — 30 codes
-  "MS-V-EBLV", "MS-V-2ZA7", "MS-V-L22Y", "MS-V-3TE8", "MS-V-Q4NL",
-  "MS-V-4YWF", "MS-V-DF5H", "MS-V-A9GQ", "MS-V-FRBC", "MS-V-78CK",
-  "MS-V-DEUX", "MS-V-YHK8", "MS-V-PA3U", "MS-V-CMTD", "MS-V-HQ2N",
-  "MS-V-Q7N8", "MS-V-S7Q9", "MS-V-HUS4", "MS-V-DMRA", "MS-V-TJJX",
-  "MS-V-VZN8", "MS-V-AURZ", "MS-V-QR3Q", "MS-V-FMWZ", "MS-V-LTR9",
-  "MS-V-4JRC", "MS-V-QQ82", "MS-V-R7YC", "MS-V-3B2S", "MS-V-9Y7A",
+  "VIE-FUT6", "VIE-VL8M", "VIE-GP73", "VIE-Q7XX", "VIE-NJ37",
+  "VIE-UJ73", "VIE-HNQH", "VIE-E3TS", "VIE-HWCR", "VIE-E8D4",
+  "VIE-QUP4", "VIE-CMMT", "VIE-PC48", "VIE-5TUN", "VIE-WAPY",
+  "VIE-HCT9", "VIE-N9M9", "VIE-FH9F", "VIE-GVSE", "VIE-QVXD",
+  "VIE-GCFG", "VIE-3Z82", "VIE-MG3A", "VIE-JZQA", "VIE-75E2",
+  "VIE-V6VV", "VIE-VUHS", "VIE-T44D", "VIE-ERJ6", "VIE-RZB8",
 ];
 
 // ---- Réglages de l'abonnement ----
