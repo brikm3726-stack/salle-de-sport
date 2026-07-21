@@ -660,7 +660,13 @@ function brancherPrix() {
 // ============================================================
 //  MODALE ABONNEMENT (le coach paie l'app)
 // ============================================================
-let planChoisi = "annuel";
+let planChoisi = "avie";
+const PLAN_PRIX = {
+  mensuel: "800 DA / mois",
+  annuel: "8000 DA / an",
+  avie: "11000 DA à vie",
+};
+const PLAN_NOM = { mensuel: "mensuelle", annuel: "annuelle", avie: "à vie" };
 let methodeChoisie = "Baridi Mob";
 
 function ouvrirAbonnement() { $("#overlaySub").classList.remove("hidden"); }
@@ -694,13 +700,13 @@ function brancherAbonnement() {
   };
 
   $("#subConfirm").onclick = () => {
-    const prix = planChoisi === "annuel" ? "19000 DA / an" : "1200 DA / mois";
+    const prix = PLAN_PRIX[planChoisi] || PLAN_PRIX.avie;
     const p = ETAT.profil || {};
     const coach = [p.prenom, p.nom].filter(Boolean).join(" ") || (ETAT.user?.email || "");
     const salle = p.nom_salle ? ` (${p.nom_salle})` : "";
     const texte =
       `Bonjour 👋, je viens de payer l'abonnement *Ma Salle*.\n\n` +
-      `• Formule : ${planChoisi} — ${prix}\n` +
+      `• Formule : ${PLAN_NOM[planChoisi] || planChoisi} — ${prix}\n` +
       `• Paiement : ${methodeChoisie}\n` +
       `• Coach : ${coach}${salle}\n\n` +
       `Voici la capture de mon paiement 👇 (merci d'activer mon compte)`;
