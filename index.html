@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=5" />
+  <link rel="stylesheet" href="css/styles.css?v=6" />
 </head>
 <body>
   <div class="bg-hero"></div>
@@ -130,6 +130,18 @@
 
     <!-- Contenu principal -->
     <main class="main">
+      <!-- Bannière essai gratuit -->
+      <div id="trialBar" class="trial-bar hidden">
+        <div class="tb-left">
+          <span class="tb-ico">🎁</span>
+          <div class="tb-txt">
+            <b>Version d'essai gratuite</b>
+            <small id="trialTime">—</small>
+          </div>
+        </div>
+        <button class="btn btn-sub btn-sm" id="trialActiver">Activer mon compte</button>
+      </div>
+
       <header class="app-topbar">
         <div class="mob-brand"><img src="ma-salle.png" alt="Ma Salle" /></div>
         <div class="page-title">
@@ -371,6 +383,29 @@
           1) Payez avec le RIP ci-dessus depuis Baridi Mob · 2) Faites une capture d'écran ·
           3) Cliquez ci-dessus : WhatsApp s'ouvre avec le message prêt, joignez votre capture et envoyez.
         </p>
+
+        <div class="activ-box">
+          <div class="pay-title" style="margin-bottom:10px">✅ Déjà payé ? Entrez votre code</div>
+          <p class="modal-sub" style="margin-bottom:10px">Le responsable vous envoie un code d'activation après vérification de votre paiement.</p>
+          <div class="activ-row">
+            <input id="codeActivation" placeholder="Ex : MASALLE-XXXX" style="text-transform:uppercase" />
+            <button class="btn btn-primary" id="btnActiver">Activer</button>
+          </div>
+          <div id="activMsg" class="msg"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= ÉCRAN DE BLOCAGE (essai terminé) ================= -->
+  <div id="overlayBloque" class="overlay lock hidden">
+    <div class="card modal" style="max-width:440px">
+      <div class="modal-body confirm-body">
+        <div class="lock-ico">🔒</div>
+        <h3>Ton essai gratuit est terminé</h3>
+        <p class="modal-sub">Pour continuer à utiliser <b>Ma Salle</b> et accéder à tes athlètes, active ton compte en choisissant une formule.</p>
+        <button class="btn btn-primary btn-block" id="bloqueVoir" style="margin-top:20px">⭐ Voir les formules & payer</button>
+        <button class="btn btn-ghost btn-block btn-sm" id="bloqueLogout" style="margin-top:10px">Déconnexion</button>
       </div>
     </div>
   </div>
@@ -380,8 +415,8 @@
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/config.js?v=5"></script>
-  <script src="js/db.js?v=5"></script>
-  <script src="js/app.js?v=5"></script>
+  <script src="js/config.js?v=6"></script>
+  <script src="js/db.js?v=6"></script>
+  <script src="js/app.js?v=6"></script>
 </body>
 </html>

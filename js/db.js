@@ -97,6 +97,49 @@ const Settings = {
 };
 
 // ------------------------------------------------------------
+//  ESSAI GRATUIT + ACTIVATION (72h puis blocage si non payé)
+//  Stocké par coach dans le navigateur : { debut, actif }.
+// ------------------------------------------------------------
+const KEY_ESSAI = "masalle_essai";
+const Abonnement = {
+  _all() { return LS.get(KEY_ESSAI, {}); },
+  // Démarre l'essai la 1re fois (idempotent : ne réinitialise jamais).
+  start(coachId) {
+    const all = this._all();
+    if (!all[coachId]) {
+      all[coachId] = { debut: new Date().toISOString(), actif: false };
+      LS.set(KEY_ESSAI, all);
+    }
+    return all[coachId];
+  },
+  get(coachId) { return this._all()[coachId] || null; },
+  estActif(coachId) { return !!(this.get(coachId)?.actif); },
+  activer(coachId) {
+    const all = this._all();
+    all[coachId] = { debut: all[coachId]?.debut || new Date().toISOString(), actif: true };
+    LS.set(KEY_ESSAI, all);
+  },
+  finTimestamp(coachId) {
+    const info = this.get(coachId);
+    if (!info) return null;
+    return new Date(info.debut).getTime() + ESSAI_HEURES * 3600 * 1000;
+  },
+  msRestant(coachId) {
+    const fin = this.finTimestamp(coachId);
+    return fin == null ? null : fin - Date.now();
+  },
+  estBloque(coachId) {
+    if (this.estActif(coachId)) return false;
+    const ms = this.msRestant(coachId);
+    return ms != null && ms <= 0;
+  },
+  // Vérifie un code d'activation saisi par le coach.
+  verifierCode(code) {
+    return (code || "").trim().toUpperCase() === String(ACTIVATION_CODE).trim().toUpperCase();
+  },
+};
+
+// ------------------------------------------------------------
 //  HISTORIQUE DES PAIEMENTS (miroir local, marche dans les 2 modes)
 // ------------------------------------------------------------
 const Paiements = {

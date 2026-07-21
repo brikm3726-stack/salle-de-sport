@@ -431,6 +431,32 @@ input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--a
   letter-spacing:.5px;color:var(--gold);font-weight:700}
 
 /* ============================================================
+   ESSAI GRATUIT / BLOCAGE / ACTIVATION
+   ============================================================ */
+.trial-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;
+  background:linear-gradient(100deg,var(--gold-soft),rgba(255,201,60,.03));
+  border:1px solid rgba(255,201,60,.3);border-radius:14px;padding:12px 16px;margin-bottom:18px;
+  animation:fadeUp .4s ease both}
+.trial-bar.urgent{background:linear-gradient(100deg,var(--red-soft),rgba(255,84,104,.03));
+  border-color:rgba(255,84,104,.35)}
+.tb-left{display:flex;align-items:center;gap:12px;min-width:0}
+.tb-ico{font-size:22px;flex:none}
+.tb-txt{min-width:0}
+.tb-txt b{display:block;font-size:14px;font-weight:700}
+.tb-txt small{color:var(--muted);font-size:12.5px;font-weight:600}
+.trial-bar.urgent .tb-txt small{color:#ff9aa6}
+
+.overlay.lock{background:rgba(5,7,10,.9);backdrop-filter:blur(10px);z-index:120}
+#overlaySub{z-index:140}  /* passe au-dessus de l'écran de blocage */
+.lock-ico{width:70px;height:70px;border-radius:20px;background:var(--accent-soft);display:grid;
+  place-items:center;font-size:34px;margin:0 auto 16px}
+
+.activ-box{margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
+.activ-row{display:flex;gap:10px}
+.activ-row input{flex:1}
+.activ-row .btn{flex:none;padding:13px 18px}
+
+/* ============================================================
    NAVIGATION MOBILE
    ============================================================ */
 .mobile-nav{display:none}

@@ -93,8 +93,10 @@ async function router() {
     }
 
     ETAT.prix = Settings.getPrix(user.id);
+    Abonnement.start(user.id);   // démarre l'essai 72h (1re fois seulement)
     renderTop();
     afficher("dashboard");
+    demarrerTrial();
     await chargerAthletes();
   } catch (e) {
     console.error("Erreur router:", e);
@@ -711,6 +713,72 @@ function brancherAbonnement() {
 }
 
 // ============================================================
+//  ESSAI GRATUIT (72h) + BLOCAGE + ACTIVATION
+// ============================================================
+let trialTimer = null;
+
+function formatDuree(ms) {
+  if (ms < 0) ms = 0;
+  const totalMin = Math.floor(ms / 60000);
+  const j = Math.floor(totalMin / (60 * 24));
+  const h = Math.floor((totalMin % (60 * 24)) / 60);
+  const m = totalMin % 60;
+  if (j > 0) return `${j}j ${h}h ${m}min`;
+  return `${h}h ${String(m).padStart(2, "0")}min`;
+}
+
+function renderTrial() {
+  const id = ETAT.user?.id;
+  if (!id) return;
+  const bar = $("#trialBar");
+  const bloque = $("#overlayBloque");
+
+  if (Abonnement.estActif(id)) {                 // compte payé/activé
+    bar.classList.add("hidden");
+    bloque.classList.add("hidden");
+    if (trialTimer) { clearInterval(trialTimer); trialTimer = null; }
+    return;
+  }
+  const ms = Abonnement.msRestant(id);
+  if (ms != null && ms <= 0) {                   // essai terminé → blocage
+    bar.classList.add("hidden");
+    bloque.classList.remove("hidden");
+    if (trialTimer) { clearInterval(trialTimer); trialTimer = null; }
+    return;
+  }
+  // En cours d'essai
+  bloque.classList.add("hidden");
+  bar.classList.remove("hidden");
+  $("#trialTime").textContent = `Il te reste ${formatDuree(ms)} avant de payer l'abonnement.`;
+  bar.classList.toggle("urgent", ms < 12 * 3600 * 1000);
+}
+
+function demarrerTrial() {
+  renderTrial();
+  if (!trialTimer) trialTimer = setInterval(renderTrial, 30000);
+}
+
+function brancherTrial() {
+  $("#trialActiver").onclick = ouvrirAbonnement;
+  $("#bloqueVoir").onclick = ouvrirAbonnement;
+  $("#bloqueLogout").onclick = async () => { await Auth.signOut(); location.reload(); };
+  $("#btnActiver").onclick = () => {
+    const code = $("#codeActivation").value;
+    if (!Abonnement.verifierCode(code)) {
+      message($("#activMsg"), "❌ Code incorrect. Vérifie avec le responsable.", "err");
+      return;
+    }
+    Abonnement.activer(ETAT.user.id);
+    message($("#activMsg"), "✅ Compte activé ! Merci 🎉", "ok");
+    setTimeout(() => {
+      fermerAbonnement();
+      renderTrial();
+      toast("Compte activé — accès complet débloqué 🎉");
+    }, 900);
+  };
+}
+
+// ============================================================
 //  BRANCHEMENTS GLOBAUX
 // ============================================================
 function brancherNav() {
@@ -731,6 +799,7 @@ function brancherEvenements() {
   brancherPaiement();
   brancherPrix();
   brancherAbonnement();
+  brancherTrial();
   brancherNav();
   $("#search").oninput = (e) => { ETAT.filtre = e.target.value; renderListe(); };
   $("#sortSelect").onchange = (e) => { ETAT.tri = e.target.value; renderListe(); };

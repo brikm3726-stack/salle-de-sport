@@ -22,6 +22,13 @@ const SUPABASE_CONFIG = {
 //  Format international SANS le "+" ni espaces (ex : 213792779320).
 const WHATSAPP_PREUVE = "213792779320";
 
+// ---- Essai gratuit + activation ----
+//  Durée de l'essai gratuit (en heures) après l'inscription.
+const ESSAI_HEURES = 72;
+//  Code SECRET que TU donnes au coach après avoir vérifié son paiement.
+//  Change-le pour ce que tu veux (garde-le confidentiel).
+const ACTIVATION_CODE = "MASALLE-VIP";
+
 // ---- Réglages de l'abonnement ----
 const REGLES = {
   dureeJours: 30,   // durée d'un abonnement (1 mois)
