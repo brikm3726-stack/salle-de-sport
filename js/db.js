@@ -74,8 +74,44 @@ const LS = {
 const KEY_SESSION = "masalle_session";
 const KEY_COACHES = "masalle_coaches";
 const KEY_ATHLETES = "masalle_athletes";
+const KEY_PAIEMENTS = "masalle_paiements";
+const KEY_PRIX = "masalle_prix";
 
 function uid() { return "id-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8); }
+
+// ------------------------------------------------------------
+//  RÉGLAGES LOCAUX (prix de l'abonnement mensuel par coach)
+//  Gardé côté navigateur pour ne pas dépendre du schéma Supabase.
+// ------------------------------------------------------------
+const Settings = {
+  getPrix(coachId) {
+    const all = LS.get(KEY_PRIX, {});
+    const v = all[coachId];
+    return (typeof v === "number" && v > 0) ? v : 1500; // prix par défaut (DA)
+  },
+  setPrix(coachId, val) {
+    const all = LS.get(KEY_PRIX, {});
+    all[coachId] = parseInt(val) || 0;
+    LS.set(KEY_PRIX, all);
+  },
+};
+
+// ------------------------------------------------------------
+//  HISTORIQUE DES PAIEMENTS (miroir local, marche dans les 2 modes)
+// ------------------------------------------------------------
+const Paiements = {
+  _log(coachId, rec) {
+    const all = LS.get(KEY_PAIEMENTS, {});
+    all[coachId] = all[coachId] || [];
+    all[coachId].unshift({ id: uid(), ...rec });
+    LS.set(KEY_PAIEMENTS, all);
+  },
+  list(coachId) {
+    const all = LS.get(KEY_PAIEMENTS, {});
+    return (all[coachId] || []).slice().sort((a, b) =>
+      (b.date_paiement || "").localeCompare(a.date_paiement || ""));
+  },
+};
 
 // ============================================================
 //  AUTHENTIFICATION
@@ -180,6 +216,7 @@ const Athletes = {
       photo_url: infos.photo_url || null,
       ...calc,
     };
+    let created;
     if (MODE_DEMO) {
       const all = LS.get(KEY_ATHLETES, {});
       all[coachId] = all[coachId] || [];
@@ -187,11 +224,23 @@ const Athletes = {
       athlete.cree_le = new Date().toISOString();
       all[coachId].push(athlete);
       LS.set(KEY_ATHLETES, all);
-      return athlete;
+      created = athlete;
+    } else {
+      const { data, error } = await sb.from("athletes").insert(athlete).select().single();
+      if (error) throw error;
+      created = data;
     }
-    const { data, error } = await sb.from("athletes").insert(athlete).select().single();
-    if (error) throw error;
-    return data;
+    // Journalise le 1er paiement (inscription)
+    Paiements._log(coachId, {
+      athlete_id: created.id,
+      athlete_nom: `${infos.nom} ${infos.prenom}`,
+      date_paiement: calc.date_paiement,
+      date_fin: calc.date_prochain_paiement,
+      montant: Settings.getPrix(coachId),
+      mois_consecutifs: calc.mois_consecutifs,
+      bonus_applique: !!calc.bonus_actif,
+    });
+    return created;
   },
 
   async update(coachId, id, infos) {
@@ -232,6 +281,16 @@ const Athletes = {
         mois_consecutifs: calc.mois_consecutifs, bonus_applique: calc.bonus_actif,
       });
     }
+    // Miroir local pour la page Paiements (les 2 modes)
+    Paiements._log(coachId, {
+      athlete_id: athlete.id,
+      athlete_nom: `${athlete.nom} ${athlete.prenom}`,
+      date_paiement: calc.date_paiement,
+      date_fin: calc.date_prochain_paiement,
+      montant: Settings.getPrix(coachId),
+      mois_consecutifs: calc.mois_consecutifs,
+      bonus_applique: !!calc.bonus_actif,
+    });
     return calc;
   },
 };
