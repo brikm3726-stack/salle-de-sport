@@ -171,7 +171,8 @@ const Athletes = {
   },
 
   async add(coachId, infos) {
-    const calc = calculerRenouvellement(null, infos.date_paiement || aujourdhui());
+    // jours_ajoutes sert seulement à l'affichage → pas une colonne en base
+    const { jours_ajoutes, ...calc } = calculerRenouvellement(null, infos.date_paiement || aujourdhui());
     const athlete = {
       coach_id: coachId,
       nom: infos.nom, prenom: infos.prenom,
@@ -220,7 +221,9 @@ const Athletes = {
   // Enregistre un nouveau paiement (renouvellement) et applique la fidélité
   async recordPayment(coachId, athlete, datePaiement) {
     const calc = calculerRenouvellement(athlete, datePaiement);
-    await this.update(coachId, athlete.id, calc);
+    // on ne sauvegarde pas jours_ajoutes (pas une colonne en base)
+    const { jours_ajoutes, ...calcDb } = calc;
+    await this.update(coachId, athlete.id, calcDb);
 
     if (!MODE_DEMO) {
       await sb.from("paiements").insert({
