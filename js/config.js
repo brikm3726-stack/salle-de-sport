@@ -18,6 +18,10 @@ const SUPABASE_CONFIG = {
   anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hb3Jsbmd6cGxkaHpzc291anF1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ1NjMxOTMsImV4cCI6MjEwMDEzOTE5M30.Z93FHGeeWL0w8CJ0BAcMQLFF_-Jp5Wxjpl6QxgYvEDw",
 };
 
+// ---- Numéro WhatsApp qui reçoit les preuves de paiement ----
+//  Format international SANS le "+" ni espaces (ex : 213792779320).
+const WHATSAPP_PREUVE = "213792779320";
+
 // ---- Réglages de l'abonnement ----
 const REGLES = {
   dureeJours: 30,   // durée d'un abonnement (1 mois)

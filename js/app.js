@@ -693,8 +693,19 @@ function brancherAbonnement() {
 
   $("#subConfirm").onclick = () => {
     const prix = planChoisi === "annuel" ? "19000 DA / an" : "1200 DA / mois";
+    const p = ETAT.profil || {};
+    const coach = [p.prenom, p.nom].filter(Boolean).join(" ") || (ETAT.user?.email || "");
+    const salle = p.nom_salle ? ` (${p.nom_salle})` : "";
+    const texte =
+      `Bonjour 👋, je viens de payer l'abonnement *Ma Salle*.\n\n` +
+      `• Formule : ${planChoisi} — ${prix}\n` +
+      `• Paiement : ${methodeChoisie}\n` +
+      `• Coach : ${coach}${salle}\n\n` +
+      `Voici la capture de mon paiement 👇 (merci d'activer mon compte)`;
+    const url = `https://wa.me/${WHATSAPP_PREUVE}?text=${encodeURIComponent(texte)}`;
+    window.open(url, "_blank");
     message($("#subMsg"),
-      `✅ Formule ${planChoisi} (${prix}) — paiement par ${methodeChoisie}. Envoie la capture de ton paiement pour activer ton compte.`,
+      `✅ WhatsApp s'ouvre avec ton message prêt. Il te reste juste à <b>joindre ta capture</b> (icône 📎 / trombone) puis à envoyer. Ton compte sera activé après vérification.`,
       "ok");
   };
 }
