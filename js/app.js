@@ -549,9 +549,20 @@ function brancherModale() {
       };
 
       if (ETAT.editId) {
-        await Athletes.update(ETAT.user.id, ETAT.editId, {
+        const maj = {
           nom: infos.nom, prenom: infos.prenom, telephone: infos.telephone, photo_url: photo,
-        });
+        };
+        // Si la date de paiement a été modifiée → on la corrige et on décale
+        // la date d'expiration d'autant (durée d'abonnement conservée).
+        if (existant && infos.date_paiement && infos.date_paiement !== existant.date_paiement) {
+          let delta = Math.round(
+            (new Date(existant.date_prochain_paiement) - new Date(existant.date_paiement)) / 86400000
+          );
+          if (!delta || delta < 0) delta = REGLES.dureeJours;
+          maj.date_paiement = infos.date_paiement;
+          maj.date_prochain_paiement = ajouterJours(infos.date_paiement, delta);
+        }
+        await Athletes.update(ETAT.user.id, ETAT.editId, maj);
         toast("Athlète mis à jour ✅");
       } else {
         await Athletes.add(ETAT.user.id, infos);
