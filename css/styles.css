@@ -161,7 +161,8 @@ input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--a
 .auth-logo{width:56px;height:56px;border-radius:16px;background:var(--grad);margin:0 auto 16px;
   display:grid;place-items:center;font-family:var(--font-head);font-weight:800;font-size:22px;
   color:#fff;box-shadow:0 12px 26px -8px rgba(255,48,64,.7);letter-spacing:-1px}
-.auth-logo-img{height:44px;width:auto;max-width:130px;margin:0 auto 14px;display:block;border-radius:11px}
+.auth-logo-img{width:56px;height:56px;object-fit:cover;margin:0 auto 16px;display:block;
+  border-radius:16px;box-shadow:0 12px 26px -8px rgba(255,48,64,.5)}
 .auth-head .big{font-size:26px;font-weight:800;line-height:1.15;font-family:var(--font-head)}
 .auth-head .big em{color:var(--accent);font-style:normal}
 .auth-head p{color:var(--muted);margin-top:8px;font-size:14px}
