@@ -415,6 +415,13 @@ input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--a
 .plan-price{font-size:32px;font-weight:800;font-family:var(--font-head);margin:8px 0 2px;line-height:1}
 .plan-price span{font-size:14px;color:var(--muted);margin-left:4px;font-weight:700}
 .plan-per{font-size:13px;color:var(--muted)}
+.plan-old{font-size:13px;color:var(--muted);text-decoration:line-through;
+  text-decoration-color:#ff5a4d;font-weight:700;margin-top:6px}
+.plans-3 .plan-old{font-size:11px;margin-top:4px}
+.plan-promo{position:absolute;top:-11px;left:50%;transform:translateX(-50%);
+  background:linear-gradient(135deg,#ff3d3d,#ff5a1f);color:#fff;font-size:10px;font-weight:800;
+  letter-spacing:1px;padding:4px 12px;border-radius:20px;white-space:nowrap}
+.plans-3 .plan-promo{font-size:8.5px;letter-spacing:.3px;padding:3px 7px}
 .plan-best{position:absolute;top:-11px;left:50%;transform:translateX(-50%);
   background:linear-gradient(135deg,var(--gold),#ff9d00);color:#231800;font-size:10px;font-weight:800;
   letter-spacing:1px;padding:4px 12px;border-radius:20px;white-space:nowrap}

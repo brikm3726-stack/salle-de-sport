@@ -676,8 +676,8 @@ function brancherPrix() {
 let planChoisi = "avie";
 const PLAN_PRIX = {
   mensuel: "800 DA / mois",
-  annuel: "8000 DA / an",
-  avie: "11000 DA à vie",
+  annuel: "6500 DA / an (promo)",
+  avie: "9500 DA à vie (promo)",
 };
 const PLAN_NOM = { mensuel: "mensuelle", annuel: "annuelle", avie: "à vie" };
 let methodeChoisie = "Baridi Mob";
